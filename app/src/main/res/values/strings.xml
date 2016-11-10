@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">VKGallery</string>
+
+    <string name="activity_login_btn_login">Войти</string>
+
+    <string name="error_message">Ошибка</string>
+
+    <string name="key_settings" translatable="false">settings</string>
+    <string name="key_settings_access_token" translatable="false">settings_access_token</string>
+</resources>
