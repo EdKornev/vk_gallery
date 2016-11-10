@@ -1,7 +1,6 @@
 package com.edkornev.vkgallery.ui.gallery.adapters;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +60,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onClick(View view) {
-
+            mPresenter.clickPhoto(getAdapterPosition());
         }
     }
 }

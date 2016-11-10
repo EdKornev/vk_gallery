@@ -19,7 +19,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.gallery.activities.GalleryActivity"/>
+        <activity android:name=".ui.gallery.activities.GalleryActivity" />
+
+        <activity android:name=".ui.preview.activities.PreviewActivity"
+            android:theme="@style/AppThemeNoToolbar"/>
 
         <activity android:name="com.vk.sdk.VKServiceActivity" android:label="ServiceActivity" android:theme="@style/VK.Transparent" />
     </application>

@@ -2,15 +2,17 @@ package com.edkornev.vkgallery.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Callable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -28,6 +30,7 @@ public class ImageLoader {
 
     private MemoryCache mMemoryCache = new MemoryCache();
     private ExecutorService mExecutorService = Executors.newFixedThreadPool(5);
+    private Map<String, ImageView> mImageViewMap = new HashMap<>();
 
     public static ImageLoader getInstance() {
         if (instance == null) {
@@ -44,32 +47,48 @@ public class ImageLoader {
         Bitmap image = mMemoryCache.get(url);
 
         if (image == null) {
-            Future<Bitmap> future = mExecutorService.submit(new LoadRunnable(url));
+            mImageViewMap.put(url, ivContent);
 
-            try {
-                image = future.get();
-
-                mMemoryCache.put(url, image);
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
+            mExecutorService.execute(new LoadRunnable(url, mHandler));
+            return;
         }
 
         ivContent.setImageBitmap(image);
     }
 
-    private class LoadRunnable implements Callable<Bitmap> {
+    public void stop() {
+        mExecutorService.shutdownNow();
+    }
+
+    private Handler mHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            String url = (String) message.obj;
+            Bitmap image = mMemoryCache.get(url);
+            ImageView ivContent = mImageViewMap.get(url);
+
+            if (image != null) {
+                ivContent.setImageBitmap(image);
+            }
+
+            mImageViewMap.remove(url);
+
+            return true;
+        }
+    });
+
+    private class LoadRunnable implements Runnable {
 
         private String mUrl;
+        private Handler mHandler;
 
-        public LoadRunnable(String url) {
+        public LoadRunnable(String url, Handler handler) {
             this.mUrl = url;
+            this.mHandler = handler;
         }
 
         @Override
-        public Bitmap call() throws Exception {
-            Bitmap image = null;
-
+        public void run() {
             try {
                 OkHttpClient httpClient = new OkHttpClient();
                 Request request = new Request.Builder().url(mUrl).get().build();
@@ -77,11 +96,16 @@ public class ImageLoader {
                 Response response = call.execute();
 
                 InputStream is = response.body().byteStream();
-                image = BitmapFactory.decodeStream(is);
+                Bitmap image = BitmapFactory.decodeStream(is);
+
+                mMemoryCache.put(mUrl, image);
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
             }
-            return image;
+
+            Message message = mHandler.obtainMessage(1, mUrl);
+
+            mHandler.sendMessage(message);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.edkornev.vkgallery;
 
 import android.app.Application;
 
+import com.edkornev.vkgallery.utils.ImageLoader;
 import com.vk.sdk.VKSdk;
 
 /**
@@ -15,5 +16,13 @@ public class BaseApplication extends Application {
 
         // Init vk
         VKSdk.initialize(getApplicationContext());
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+
+        // Stop tasks
+        ImageLoader.getInstance().stop();
     }
 }
