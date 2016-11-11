@@ -10,7 +10,6 @@ import com.edkornev.vkgallery.utils.api.models.response.PhotoResponse;
 import com.vk.sdk.VKAccessToken;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,38 +23,63 @@ public class GalleryPresenter {
     private static final String TAG = GalleryPresenter.class.getSimpleName();
 
     private GalleryView mView;
-    private List<PhotoResponse> mPhotos = new ArrayList<>();
+    private ArrayList<PhotoResponse> mPhotos = new ArrayList<>();
+    private int mIsMore = 1;
+    private long mOffset = 0;
+    private long mCount = 0;
 
     public GalleryPresenter(GalleryView view) {
         this.mView = view;
     }
 
     public void loadPhotos() {
-        String accessToken = VKAccessToken.currentToken().accessToken;
+        if (mIsMore == 1) {
+            String accessToken = VKAccessToken.currentToken().accessToken;
 
-        Call<BaseResponse<PhotoListResponse>> request = HttpApi.getInstance().getApi().getPhotos(1, 0L, 1, 1, accessToken, "5.60");
-        request.enqueue(new Callback<BaseResponse<PhotoListResponse>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<PhotoListResponse>> call, Response<BaseResponse<PhotoListResponse>> response) {
-                if (response.code() == 200) {
-                    mPhotos.addAll(response.body().getResponse().getItems());
+            Call<BaseResponse<PhotoListResponse>> request = HttpApi.getInstance().getApi().getPhotos(1, mOffset, 1, 1, accessToken, "5.60", "52138567");
+            request.enqueue(new Callback<BaseResponse<PhotoListResponse>>() {
+                @Override
+                public void onResponse(Call<BaseResponse<PhotoListResponse>> call, Response<BaseResponse<PhotoListResponse>> response) {
+                    if (response.code() == 200) {
+                        mPhotos.addAll(response.body().getResponse().getItems());
+                        mCount = response.body().getResponse().getCount();
+                        mIsMore = response.body().getResponse().getMore();
+                        mOffset = mPhotos.size();
 
-                    mView.loadedPhotos();
+                        mView.loadedPhotos();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<BaseResponse<PhotoListResponse>> call, Throwable t) {
-                Log.e(TAG, t.getMessage(), t);
-            }
-        });
+                @Override
+                public void onFailure(Call<BaseResponse<PhotoListResponse>> call, Throwable t) {
+                    Log.e(TAG, t.getMessage(), t);
+                }
+            });
+        }
     }
 
     public void clickPhoto(int position) {
         mView.onClickPhoto(position);
     }
 
-    public List<PhotoResponse> getPhotos() {
+    public void restoreState(ArrayList<PhotoResponse> photos, int isMore, long count) {
+        this.mPhotos = photos;
+        this.mIsMore = isMore;
+        this.mOffset = photos.size();
+        this.mCount = count;
+
+        mView.loadedPhotos();
+    }
+
+    public ArrayList<PhotoResponse> getPhotos() {
         return mPhotos;
+    }
+
+    public int getMore() {
+        return mIsMore;
+    }
+
+    public long getCount() {
+        return mCount;
     }
 }

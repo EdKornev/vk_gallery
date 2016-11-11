@@ -1,4 +1,4 @@
-package com.edkornev.vkgallery.utils;
+package com.edkornev.vkgallery.utils.cache;
 
 import android.graphics.Bitmap;
 

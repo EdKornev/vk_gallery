@@ -4,6 +4,8 @@
     <string name="activity_login_btn_login">Войти</string>
 
     <string name="activity_preview_tv_count">%1$d/%2$d</string>
+    <string name="activity_preview_tv_likes">Likes: %1$d</string>
+    <string name="activity_preview_tv_shares">Shares: %1$d</string>
 
     <string name="error_message">Ошибка</string>
     <string name="error_message_api">Ошибка в запросе api VK</string>

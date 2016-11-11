@@ -23,6 +23,12 @@ public class PreviewAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        if (mPresenter.getMore() == 1
+                && mPresenter.getPhotos().size() > 5
+                && position == mPresenter.getPhotos().size() - 2) {
+            mPresenter.loadPhotos();
+        }
+
         Bundle arguments = new Bundle();
         arguments.putParcelable(PreviewPhotoFragment.KEY_BUNDLE_PHOTO, mPresenter.getPhotos().get(position));
 

@@ -16,6 +16,7 @@ import com.vk.sdk.api.VKError;
 public class LoginActivity extends BaseActivity implements View.OnClickListener, VKCallback<VKAccessToken> {
 
     private static final String PHOTO_SCOPE = "photos";
+    private static final String FRIEND_SCOPE = "friends";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onClick(View view) {
-        VKSdk.login(this, PHOTO_SCOPE);
+        VKSdk.login(this, PHOTO_SCOPE, FRIEND_SCOPE);
     }
 
     /* VK Callbacks */
@@ -47,6 +48,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
         Intent activity = new Intent(this, GalleryActivity.class);
         startActivity(activity);
+
+        finish();
     }
 
     @Override

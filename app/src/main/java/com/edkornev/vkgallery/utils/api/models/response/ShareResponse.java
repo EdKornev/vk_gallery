@@ -23,7 +23,7 @@ public class ShareResponse implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-
+        parcel.writeLong(count);
     }
 
     public Long getCount() {

@@ -11,7 +11,6 @@ import com.edkornev.vkgallery.utils.api.models.response.PhotoResponse;
 import com.vk.sdk.VKAccessToken;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,7 +24,8 @@ public class PreviewPresenter {
     private static final String TAG = PreviewPresenter.class.getSimpleName();
 
     private PreviewView mView;
-    private List<PhotoResponse> mPhotos = new ArrayList<>();
+    private ArrayList<PhotoResponse> mPhotos = new ArrayList<>();
+    private int mIsMore;
     private long mCount;
 
     public PreviewPresenter(PreviewView mView) {
@@ -33,34 +33,60 @@ public class PreviewPresenter {
     }
 
     public void loadPhotos() {
-        String accessToken = VKAccessToken.currentToken().accessToken;
+        if (mIsMore == 1) {
+            String accessToken = VKAccessToken.currentToken().accessToken;
 
-        Call<BaseResponse<PhotoListResponse>> request = HttpApi.getInstance().getApi().getPhotos(1, 0L, 1, 1, accessToken, "5.60");
-        request.enqueue(new Callback<BaseResponse<PhotoListResponse>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<PhotoListResponse>> call, Response<BaseResponse<PhotoListResponse>> response) {
-                if (response.code() == 200) {
-                    BaseResponse<PhotoListResponse> body = response.body();
-                    mPhotos.addAll(body.getResponse().getItems());
-                    mCount = body.getResponse().getCount();
+            Call<BaseResponse<PhotoListResponse>> request = HttpApi.getInstance().getApi().getPhotos(1, (long) mPhotos.size(), 1, 1, accessToken, "5.60", "52138567");
+            request.enqueue(new Callback<BaseResponse<PhotoListResponse>>() {
+                @Override
+                public void onResponse(Call<BaseResponse<PhotoListResponse>> call, Response<BaseResponse<PhotoListResponse>> response) {
+                    if (response.code() == 200) {
+                        BaseResponse<PhotoListResponse> body = response.body();
+                        mPhotos.addAll(body.getResponse().getItems());
+                        mCount = body.getResponse().getCount();
+                        mIsMore = body.getResponse().getMore();
 
-                    mView.loadedPhotos();
+                        mView.loadedPhotos();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<BaseResponse<PhotoListResponse>> call, Throwable t) {
-                Log.e(TAG, t.getMessage(), t);
-                mView.onShowError(R.string.error_message_api);
-            }
-        });
+                @Override
+                public void onFailure(Call<BaseResponse<PhotoListResponse>> call, Throwable t) {
+                    Log.e(TAG, t.getMessage(), t);
+                    mView.onShowError(R.string.error_message_api);
+                }
+            });
+        }
     }
 
-    public List<PhotoResponse> getPhotos() {
+    public void restoreState(ArrayList<PhotoResponse> photos, int isMore) {
+        this.mPhotos = photos;
+        this.mIsMore = isMore;
+
+        mView.loadedPhotos();
+    }
+
+    public ArrayList<PhotoResponse> getPhotos() {
         return mPhotos;
+    }
+
+    public void setPhotos(ArrayList<PhotoResponse> photos) {
+        this.mPhotos = photos;
+    }
+
+    public int getMore() {
+        return mIsMore;
+    }
+
+    public void setMore(int isMore) {
+        this.mIsMore = isMore;
     }
 
     public long getCount() {
         return mCount;
+    }
+
+    public void setCount(long count) {
+        this.mCount = count;
     }
 }
