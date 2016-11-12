@@ -35,9 +35,6 @@ public class LruMemoryCache {
         synchronized (this) {
             mSize += sizeOf(key, value);
             Bitmap previous = mHardCache.put(key, value);
-//            if (previous != null) {
-//                mSize -= sizeOf(key, previous);
-//            }
         }
 
         trimToSize(mMaxSize);

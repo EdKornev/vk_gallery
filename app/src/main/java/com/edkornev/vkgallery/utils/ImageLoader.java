@@ -75,6 +75,10 @@ public class ImageLoader {
     }
 
     public void stop() {
+        // clear cache
+        mLruMemoryCache.clear();
+
+        // clear tasks
         mExecutorService.shutdownNow();
     }
 

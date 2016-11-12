@@ -22,7 +22,7 @@ public class BaseApplication extends Application {
     public void onTerminate() {
         super.onTerminate();
 
-        // Stop tasks
+        // Stop tasks, clear cache
         ImageLoader.getInstance().stop();
     }
 }

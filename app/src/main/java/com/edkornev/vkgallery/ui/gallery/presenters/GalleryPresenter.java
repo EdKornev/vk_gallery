@@ -1,24 +1,17 @@
 package com.edkornev.vkgallery.ui.gallery.presenters;
 
-import android.util.Log;
-
+import com.edkornev.vkgallery.ui.base.tasks.BaseTask;
+import com.edkornev.vkgallery.ui.gallery.tasks.GalleryLoadPhotoTask;
 import com.edkornev.vkgallery.ui.gallery.views.GalleryView;
-import com.edkornev.vkgallery.utils.api.HttpApi;
-import com.edkornev.vkgallery.utils.api.models.response.BaseResponse;
 import com.edkornev.vkgallery.utils.api.models.response.PhotoListResponse;
 import com.edkornev.vkgallery.utils.api.models.response.PhotoResponse;
-import com.vk.sdk.VKAccessToken;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Eduard on 10.11.2016.
  */
-public class GalleryPresenter {
+public class GalleryPresenter implements BaseTask.TaskListener<PhotoListResponse> {
 
     private static final String TAG = GalleryPresenter.class.getSimpleName();
 
@@ -34,27 +27,9 @@ public class GalleryPresenter {
 
     public void loadPhotos() {
         if (mIsMore == 1) {
-            String accessToken = VKAccessToken.currentToken().accessToken;
+            GalleryLoadPhotoTask task = new GalleryLoadPhotoTask(this);
 
-            Call<BaseResponse<PhotoListResponse>> request = HttpApi.getInstance().getApi().getPhotos(1, mOffset, 1, 1, accessToken, "5.60", "52138567");
-            request.enqueue(new Callback<BaseResponse<PhotoListResponse>>() {
-                @Override
-                public void onResponse(Call<BaseResponse<PhotoListResponse>> call, Response<BaseResponse<PhotoListResponse>> response) {
-                    if (response.code() == 200) {
-                        mPhotos.addAll(response.body().getResponse().getItems());
-                        mCount = response.body().getResponse().getCount();
-                        mIsMore = response.body().getResponse().getMore();
-                        mOffset = mPhotos.size();
-
-                        mView.loadedPhotos();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<BaseResponse<PhotoListResponse>> call, Throwable t) {
-                    Log.e(TAG, t.getMessage(), t);
-                }
-            });
+            task.execute(mOffset);
         }
     }
 
@@ -81,5 +56,20 @@ public class GalleryPresenter {
 
     public long getCount() {
         return mCount;
+    }
+
+    @Override
+    public void onSuccess(PhotoListResponse response) {
+        mPhotos.addAll(response.getItems());
+        mCount = response.getCount();
+        mIsMore = response.getMore();
+        mOffset = mPhotos.size();
+
+        mView.loadedPhotos();
+    }
+
+    @Override
+    public void onError(int resId) {
+        mView.showError(resId);
     }
 }

@@ -108,6 +108,11 @@ public class GalleryActivity extends BaseActivity implements GalleryView {
         startActivity(activity);
     }
 
+    @Override
+    public void showError(int resId) {
+        super.showErrorDialog(getString(resId));
+    }
+
     private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {

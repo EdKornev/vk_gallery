@@ -6,4 +6,5 @@ package com.edkornev.vkgallery.ui.gallery.views;
 public interface GalleryView {
     void loadedPhotos();
     void onClickPhoto(int position);
+    void showError(int resId);
 }
