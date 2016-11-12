@@ -35,7 +35,14 @@ public class PreviewLoadPhotoTask extends BaseTask<Long, Void, PhotoListResponse
         long offset = longs[0];
 
         try {
-            Call<BaseResponse<PhotoListResponse>> request = HttpApiService.getInstance().getApi().getPhotos(REQUEST_FIELD_EXTENDED, offset, REQUEST_FIELD_NO_SERVICE_ALBUMS, REQUEST_FIELD_SKIP_HIDDEN, accessToken, HttpApiService.API_VERSION, "52138567");
+            Call<BaseResponse<PhotoListResponse>> request = HttpApiService.getInstance().getApi().getPhotos(
+                    REQUEST_FIELD_EXTENDED,
+                    offset,
+                    REQUEST_FIELD_NO_SERVICE_ALBUMS,
+                    REQUEST_FIELD_SKIP_HIDDEN,
+                    accessToken,
+                    HttpApiService.API_VERSION
+            );
             Response<BaseResponse<PhotoListResponse>> response = request.execute();
 
             if (response.code() == 200) {

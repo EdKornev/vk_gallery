@@ -54,7 +54,6 @@ public class HttpApiService {
                                                         @Query("no_service_albums") Integer noServiceAlbums,
                                                         @Query("skip_hidden") Integer skipHidden,
                                                         @Query("access_token") String accessToken,
-                                                        @Query("v") String v,
-                                                        @Query("owner_id") String id);
+                                                        @Query("v") String v);
     }
 }
